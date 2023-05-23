@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import axios from 'axios'
-
+import classNames from 'classnames'
 function App() {
   const [count, setCount] = useState(0)
   const [words, setWords] = useState([])
   const [currentWords, setCurrentWords] = useState([])
+  const [currIndex, setCurrIndex]=useState(0)
   const countRef = useRef(count); // Add this line
 
   useEffect(() => {
@@ -40,6 +41,7 @@ function App() {
     if(countRef.current !== count) {
       return
     }
+    setCurrIndex(index)
     const speech = new SpeechSynthesisUtterance(text[index]);
     speech.lang = "fr-FR"; // Set the language to French
     let voices = window.speechSynthesis.getVoices();
@@ -65,7 +67,10 @@ function App() {
         <div className = "flex">
         {words.slice(count*30-30, count*30).map((word, idx) => {
           return (
-            <p onClick={() => console.log(word)} key={idx}>{word}</p>
+            <>
+              {/* <p onClick={() => console.log(word)}>{word}</p> */}
+              <Stateless key ={idx} word={word} index={idx} currentIndex={currIndex}/>
+            </>
             )
           })}
           </div>
@@ -94,9 +99,9 @@ export default App
 // highlight index of word its on
 // skip the index if its in an array
 
-const stateless = (word, index, currentIndex) => {
+const Stateless = ({word, index, currentIndex}) => {
   const highlight = index === currentIndex
   return (
-    <p className="">{word}</p>
+    <p className={classNames((highlight && 'highlight'), 'stateless')}>{word}</p>
   )
 }

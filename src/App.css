@@ -48,3 +48,7 @@
   padding: 2rem;
   border: 1px solid white;
 }
+
+.highlight {
+  background-color: aquamarine;
+}
