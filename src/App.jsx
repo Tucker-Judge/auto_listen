@@ -7,24 +7,28 @@ function App() {
   const [words, setWords] = useState([])
   const [currentWords, setCurrentWords] = useState([])
   const [currIndex, setCurrIndex]=useState(0)
+  const [input, setInput] = useState(0)
   const countRef = useRef(count); // Add this line
 
   useEffect(() => {
     (async function(){
       try {
-        const res = await axios.get('/french.txt');
+        const res = await axios.get('/german.txt');
         const wordList = res.data.split('\n');
         setWords(wordList);
+        setCount(parseInt(localStorage.getItem('count'), 10) || 0)
         console.log(wordList);
       }
       catch (err) {
         console.error(err);
       }
     })()
+    return
   }, []);
 
   useEffect(() => {
-
+    localStorage.removeItem('count')
+    localStorage.setItem('count', count)
     countRef.current = count; // And this line
     let text = words.slice(count*30-30,count*30)
     console.log(text);
@@ -37,15 +41,17 @@ function App() {
   const speak = (text, index = 0) => {
     if (index >= text.length){
       index = 0
+      setCount(count + 1)
     }
     if(countRef.current !== count) {
       return
     }
     setCurrIndex(index)
     const speech = new SpeechSynthesisUtterance(text[index]);
-    speech.lang = "fr-FR"; // Set the language to French
+    speech.lang = "de-DE"; // Set the language to French
     let voices = window.speechSynthesis.getVoices();
-    speech.voice = voices.find(voice => voice.lang.includes('fr'));
+    speech.voice = voices.find(voice => voice.lang.includes('de'));
+    speech.rate = 1
     window.speechSynthesis.speak(speech);
 
     speech.onend = () => {
@@ -60,10 +66,12 @@ function App() {
   return (
     <>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() => setCount(Number(count+1))}>
           count is {count}
         </button>
-        
+        <input type="number" onChange={(e)=>setInput(Number(e.target.value))}></input>
+        <button type='button' onClick = {() => {setCount(input);setInput(0)}}>√</button>
+
         <div className = "flex">
         {words.slice(count*30-30, count*30).map((word, idx) => {
           return (
